@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server";
+import { MiddlewareRequest } from "@netlify/next";
 
 export default async function middleware(req: NextRequest) {
+  const r = new MiddlewareRequest(req);
   const endpoint: Endpoint | undefined = endpoints.find(
     endPoint => endPoint.path === req.nextUrl.pathname
   )
@@ -8,7 +10,7 @@ export default async function middleware(req: NextRequest) {
     return forbid("Path not found")
   }
   if (endpoint.requiredFields) {
-    const hasFields = await hasRequiredFields(req, endpoint)
+    const hasFields = await hasRequiredFields(r, endpoint)
     if (!hasFields) {
       return forbid("Missing required fields")
     }
@@ -16,7 +18,7 @@ export default async function middleware(req: NextRequest) {
   return allow()
 }
 
-const hasRequiredFields = async (req: NextRequest, endpoint: Endpoint) => {
+const hasRequiredFields = async (req: MiddlewareRequest, endpoint: Endpoint) => {
   // When this is called, the API route (req.nextUrl) which is transferred by allow() method receives an empty body
   // This only happens on Netlify, not on localhost
   const body = await req.json()
