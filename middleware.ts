@@ -4,7 +4,7 @@ import { MiddlewareRequest } from "@netlify/next";
 export default async function middleware(req: NextRequest) {
   const r = new MiddlewareRequest(req);
   const endpoint: Endpoint | undefined = endpoints.find(
-    endPoint => endPoint.path === req.nextUrl.pathname
+    endPoint => endPoint.path === r.nextUrl.pathname
   )
   if (!endpoint) {
     return forbid("Path not found")
